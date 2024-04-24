@@ -1,0 +1,8 @@
+build/
+__pycache__/
+dist/
+consts.py/
+*.spec
+todo.txt
+files/
+config.json

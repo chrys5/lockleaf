@@ -1,0 +1,1 @@
+CONFIG_PATH = "C:\\Users\\jonlu\\VSCodeProjects\\lockleaf\\config\\config.json"
