@@ -1,7 +1,7 @@
 build/
 __pycache__/
 dist/
-consts.py/
+consts.py
 *.spec
 todo.txt
 files/
