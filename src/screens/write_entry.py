@@ -30,7 +30,7 @@ class Write_Entry(Frame):
         
         self._save_popup = PopupMenu(screen=screen, 
                                      menu_items=[("Encrypt", self._prompt_password), 
-                                                 ("Don't Encrypt", self._save_unencrypted),
+                                                 ("Save", self._save_unencrypted),
                                                  ("Cancel", self._remove_popups)], 
                                     x=2, 
                                     y=screen.height-3)
@@ -98,7 +98,6 @@ class Write_Entry(Frame):
                     self._instance["media"],
                     self._instance["time_created"],
                     self._instance["root_path"])
-        self._leave(reset_instance=True)
         
     def _remove_popups(self):
         if self._save_popup in self.scene.effects:
