@@ -1,1 +1,1 @@
-pyinstaller --onefile --icon=login-lock_icon-icons.com_48537.ico src/lockleaf.py
+pyinstaller --onefile --icon=52949.ico src/lockleaf.py

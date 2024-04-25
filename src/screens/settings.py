@@ -1,11 +1,12 @@
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
-from asciimatics.effects import Print, Cycle
+from asciimatics.event import KeyboardEvent
 from asciimatics.particles import StarFirework, PalmFirework, SerpentFirework
 from asciimatics.renderers import FigletText
 from asciimatics.exceptions import NextScene, ResizeScreenError
 from asciimatics.widgets import Frame, Layout, Text, Button, PopUpDialog, TextBox, Widget
 
+import sys
 import os
 from consts import CONFIG_PATH
 from screens.write_entry import Write_Entry
@@ -16,7 +17,7 @@ class Settings(Frame):
                                         screen.height, 
                                         screen.width, 
                                         hover_focus=False,
-                                        can_scroll=False)
+                                        can_scroll=True)
 
         self._instance = instance
         self.set_theme(instance["theme"])
@@ -24,6 +25,8 @@ class Settings(Frame):
         self._theme = Text(label="Theme", name="Theme")
         self._ok_button = Button("OK", self._save_settings)
         self._back_button = Button("Back", self._cancel)
+
+        self._about_text = TextBox(height=Widget.FILL_FRAME, as_string=True, line_wrap=True)
 
         self._pop_up = PopUpDialog(screen=screen,
                                     text="Invalid root path",
@@ -39,7 +42,38 @@ class Settings(Frame):
 
         about = Layout([100], fill_frame=True)
         self.add_layout(about)
-        about.add_widget(TextBox(Widget.FILL_FRAME, "Lockleaf is a simple journaling application that encrypts your entries. It is designed to be simple and easy to use and is perfect for those who want to keep their thoughts private.", readonly=True))
+        about.add_widget(self._about_text)
+        
+        self._about_text.value =  """
+Lockleaf is a simple journaling application that encrypts your entries. It is designed to be simple and easy to use and is perfect for those who want to keep their thoughts private. If you forget your password, you will not be able to recover your entries. Keep your password safe and secure.
+Try not to resize the window, as it will cause the application to restart.
+
+[scroll up for info]
+- Shortcuts:
+    Ctrl + q: Exit
+    Escape: Back
+    Ctrl + h: Toggle show/hide password
+- Main Menu Screen:
+    Ctrl + w: Write Entry
+    Ctrl + a: Archives 
+- Write Entry Screen: 
+    HOME: Go to beginning of line 
+    END: Go to end of line
+    PAGE UP: Go up one page
+    PAGE DOWN: Go down one page
+    DELETE: Delete line
+    INSERT: Copy entry to clipboard
+    Ctrl + e: Save entry with encryption (will prompt password)
+    Ctrl + d: Save entry without encryption 
+    Ctrl + m: Add media to entry (not working yet)
+- Archives Screen: 
+    Ctrl + w: Open selected entry 
+    Ctrl + e: Encrypt all entries in folder 
+    Ctrl + d: Decrypt all entries in folder 
+    Ctrl + r: Go to root folder 
+    DELETE: Delete entry or folder 
+            """
+        self._about_text._line = 0
 
         layout2 = Layout([50, 50])
         self.add_layout(layout2)
@@ -59,4 +93,12 @@ class Settings(Frame):
         raise ResizeScreenError("refresh app 0")
     
     def _cancel(self):
-        raise NextScene("Main Menu")
+        raise ResizeScreenError("refresh app 0")
+    
+    def process_event(self, event):
+        if isinstance(event, KeyboardEvent):
+            if event.key_code == Screen.ctrl("q"):
+                sys.exit(0)
+            elif event.key_code == Screen.KEY_ESCAPE:
+                self._cancel()
+        return super().process_event(event)

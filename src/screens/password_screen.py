@@ -1,9 +1,11 @@
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
+from asciimatics.event import KeyboardEvent
 from asciimatics.exceptions import NextScene
 from asciimatics.widgets import Frame, Layout, Text, Button, PopUpDialog
 
 from entry_processes import save_entry
+import sys
 
 class Password_Screen(Frame):
     def __init__(self, screen, instance):
@@ -15,8 +17,8 @@ class Password_Screen(Frame):
         
         self._instance = instance
         self.set_theme(instance["theme"])
-        self._password_prompt = Text(label="Enter Password:", name="Password", hide_char="#")
-        self._password_confirm = Text(label="Confirm Password:", name="Confirm Password", hide_char="#")
+        self._password_prompt = Text(label="Enter Password:", name="Password", hide_char="*")
+        self._password_confirm = Text(label="Confirm Password:", name="Confirm Password", hide_char="*")
         self._ok_button = Button("OK", self._save_encrypted)
         self._cancel_button = Button("Cancel", self._return_to_write_entry)
         self._password_error = PopUpDialog(screen=screen, 
@@ -60,3 +62,22 @@ class Password_Screen(Frame):
     def _reset_passwords(self, idx):
         self._password_prompt.value("")
         self._password_confirm.value("")
+
+    def process_event(self, event):
+        if isinstance(event, KeyboardEvent):
+            if event.key_code == Screen.ctrl("q"):
+                sys.exit(0)
+            if event.key_code == Screen.KEY_ESCAPE:
+                self._return_to_write_entry()
+            if event.key_code == Screen.ctrl("h"):
+                #toggle hide password
+                if self._password_prompt._hide_char:
+                    self._password_prompt._hide_char = None
+                    self._password_confirm._hide_char = None
+                else:
+                    self._password_prompt._hide_char = "*"
+                    self._password_confirm._hide_char = "*"
+                self._password_prompt.update(0)
+                self._password_confirm.update(0)
+            
+        return super().process_event(event)

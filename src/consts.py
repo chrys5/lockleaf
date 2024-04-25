@@ -1,1 +1,1 @@
-CONFIG_PATH = "C:\\Users\\jonlu\\VSCodeProjects\\lockleaf\\config\\config.json"
+CONFIG_PATH = "C:\\Users\\jonlu\\VSCodeProjects\\lockleaf\\dist\\config.json"

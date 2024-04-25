@@ -1,8 +1,11 @@
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
+from asciimatics.event import KeyboardEvent
 from asciimatics.exceptions import NextScene, ResizeScreenError
 from asciimatics.widgets import Frame, ListBox, Layout, Text, Button, Label, FileBrowser, Divider, TextBox, Widget, VerticalDivider, PopupMenu, PopUpDialog
 from entry_processes import save_entry
+import sys
+import pyperclip
 import datetime
 
 class Write_Entry(Frame):
@@ -11,7 +14,7 @@ class Write_Entry(Frame):
                                         screen.height, 
                                         screen.width, 
                                         hover_focus=False,
-                                        can_scroll=False)
+                                        can_scroll=True)
         
         self._instance = instance
         self.set_theme(instance["theme"])
@@ -80,13 +83,14 @@ class Write_Entry(Frame):
         self._instance["media"] = self._media.options
 
     def _save(self):
-        self._update_instance()
         self.scene.add_effect(self._save_popup)
 
     def _prompt_password(self):
+        self._update_instance()
         raise NextScene("Password")
         
     def _save_unencrypted(self):
+        self._update_instance()
         save_entry(self._instance["title"],
                     self._instance["folder"],
                     self._instance["entry"],
@@ -102,6 +106,33 @@ class Write_Entry(Frame):
     def _leave(self, reset_instance=False):
         raise ResizeScreenError("reset app 0")
         
+    def process_event(self, event):
+        if isinstance(event, KeyboardEvent):
+            if event.key_code == Screen.ctrl("q"):
+                sys.exit(0)
+            elif event.key_code == Screen.KEY_ESCAPE:
+                self._leave()
+            elif event.key_code == Screen.ctrl("d"):
+                self._save_unencrypted()
+            elif event.key_code == Screen.ctrl("e"):
+                self._prompt_password()
+            elif event.key_code == Screen.ctrl("m"):
+                self._add_media()
+            elif event.key_code == Screen.KEY_DELETE:
+                curr_line = self._entry_box._line
+                line_arr = self._entry_box.value.split("\n")
+                if curr_line < len(line_arr):
+                    line_arr.pop(curr_line)
+                    self._entry_box.value = "\n".join(line_arr)
+                    self._entry_box._line = curr_line
+                    if curr_line == len(line_arr):
+                        self._entry_box._line -= 1
+            elif event.key_code == Screen.KEY_INSERT:
+                #copy entry to clipboard
+                pyperclip.copy(self._entry_box.value)
+            else:
+                pass
+        return super().process_event(event)
 
     def _add_media(self):
         return

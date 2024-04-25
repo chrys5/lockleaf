@@ -1,8 +1,6 @@
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
-from asciimatics.effects import Print, Cycle
-from asciimatics.particles import StarFirework, PalmFirework, SerpentFirework
-from asciimatics.renderers import FigletText
+from asciimatics.event import KeyboardEvent
 from asciimatics.exceptions import NextScene, ResizeScreenError
 from asciimatics.widgets import Frame, ListBox, Layout, Text, Button, Label, Divider, TextBox, Widget
 import sys
@@ -20,17 +18,19 @@ instance = {}
 class Main_Menu(Frame):
     def __init__(self, screen, instance):
         super(Main_Menu, self).__init__(screen, 
-                                        screen.height, 
-                                        screen.width,
+                                        20,
+                                        50,
+                                        x=screen.width//2-25,
+                                        y=screen.height//2-10,
                                         title="Lockleaf",
-                                        hover_focus=True,
+                                        hover_focus=False,
                                         can_scroll=False,
                                         reduce_cpu=True)
         
         self.set_theme(instance["theme"])
         self._list_view = ListBox(
             Widget.FILL_FRAME,
-            [("Write Entry", 1), ("Archives", 2), ("Settings", 3), ("Exit", 4)],
+            [("< Write Entry >", 1), ("< Archives >", 2), ("< Settings >", 3), ("< Exit >", 4)],
             name="Main Menu",
             add_scroll_bar=True,
             on_select=self._select)
@@ -50,6 +50,16 @@ class Main_Menu(Frame):
             raise NextScene("Settings")
         elif self._list_view.value == 4:
             sys.exit(0)
+
+    def process_event(self, event):
+        if isinstance(event, KeyboardEvent):
+            if event.key_code == Screen.ctrl("q"):
+                sys.exit(0)
+            if event.key_code == Screen.ctrl("w"):
+                raise NextScene("Write Entry")
+            if event.key_code == Screen.ctrl("a"):
+                raise NextScene("Archives")
+        return super().process_event(event)
 
 def demo(screen, sceneidx, instance):
     #parse config file

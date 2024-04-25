@@ -1,9 +1,13 @@
+from asciimatics.screen import Screen
+from asciimatics.scene import Scene
+from asciimatics.event import KeyboardEvent
 from asciimatics.exceptions import NextScene, ResizeScreenError
 from asciimatics.widgets import Frame, PopUpDialog, Layout, FileBrowser, Widget, Text, Button
 
 from gerbil.encryption import secure_delete
 from entry_processes import encrypt_entry, decrypt_entry, load_entry, is_encrypted
 
+import sys
 import os
 
 class Archives(Frame):
@@ -26,7 +30,7 @@ class Archives(Frame):
                                      file_filter=".*.lockleaf")
         self._selected_file = Text(label="Selected File:", name="Selected File", readonly=True)
         self._selected_file.disabled = True
-        self._password_prompt = Text(label="Password:", name="Password", hide_char="#")
+        self._password_prompt = Text(label="Password:", name="Password", hide_char="*")
         
         self._back_to_root_button = Button("Root", self._back_to_root)
         self._encrypt_folder_button = Button("Encrypt All Entries", self._encrypt_folder)
@@ -46,8 +50,11 @@ class Archives(Frame):
         layout = Layout([100], fill_frame=True)
         self.add_layout(layout)
         layout.add_widget(self._file_browser)
-        layout.add_widget(self._selected_file)
-        layout.add_widget(self._password_prompt)
+
+        text_layout = Layout([100])
+        self.add_layout(text_layout)
+        text_layout.add_widget(self._selected_file)
+        text_layout.add_widget(self._password_prompt)
 
         layout2 = Layout([2, 2, 1, 1, 1, 1])
         self.add_layout(layout2)
@@ -150,3 +157,34 @@ class Archives(Frame):
     def _cancel(self):
         self._password_prompt.value = ""
         raise NextScene("Main Menu")
+    
+    def process_event(self, event):
+        if isinstance(event, KeyboardEvent):
+            if event.key_code == Screen.ctrl("q"):
+                sys.exit(0)
+            elif event.key_code == Screen.KEY_ESCAPE:
+                self._cancel()
+            if event.key_code == Screen.ctrl("h"):
+                #toggle hide password
+                if self._password_prompt._hide_char:
+                    self._password_prompt._hide_char = None
+                else:
+                    self._password_prompt._hide_char = "*"
+                self._password_prompt.update(0)
+            elif event.key_code == Screen.ctrl("w"):
+                if self._open_button.disabled == False:
+                    self._open_entry()
+            elif event.key_code == Screen.ctrl("r"):
+                self._back_to_root()
+            elif event.key_code == Screen.ctrl("e"):
+                if self._encrypt_folder_button.disabled == False:
+                    self._encrypt_folder()
+            elif event.key_code == Screen.ctrl("d"):
+                if self._decrypt_folder_button.disabled == False:
+                    self._decrypt_folder()
+            elif event.key_code == Screen.KEY_DELETE:
+                if self._delete_button.disabled == False:
+                    self._delete()
+            else:
+                pass
+        return super().process_event(event)
