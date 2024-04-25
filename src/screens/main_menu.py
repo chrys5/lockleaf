@@ -2,7 +2,8 @@ from asciimatics.screen import Screen
 from asciimatics.scene import Scene
 from asciimatics.event import KeyboardEvent
 from asciimatics.exceptions import NextScene, ResizeScreenError
-from asciimatics.widgets import Frame, ListBox, Layout, Text, Button, Label, Divider, TextBox, Widget
+from asciimatics.effects import Print, Cycle, Stars, Wipe, BannerText, Mirage, Matrix, Clock, RandomNoise, Scroll, Cog, Print
+from asciimatics.widgets import Frame, Label, Layout, Text, Button, VerticalDivider, Divider, TextBox, Widget, PopupMenu, Widget
 import sys
 import json
 
@@ -10,46 +11,65 @@ from screens.write_entry import Write_Entry
 from screens.archives_screen import Archives
 from screens.settings import Settings
 from screens.password_screen import Password_Screen
-from consts import CONFIG_PATH
+from config import CONFIG_PATH
 
+import numpy.random as random
 
 instance = {}
 
 class Main_Menu(Frame):
     def __init__(self, screen, instance):
-        super(Main_Menu, self).__init__(screen, 
-                                        20,
-                                        50,
-                                        x=screen.width//2-25,
-                                        y=screen.height//2-10,
+        super(Main_Menu, self).__init__(screen,
+                                        screen.height,
+                                        screen.width,
                                         title="Lockleaf",
                                         hover_focus=False,
                                         can_scroll=False,
                                         reduce_cpu=True)
         
         self.set_theme(instance["theme"])
-        self._list_view = ListBox(
-            Widget.FILL_FRAME,
-            [("< Write Entry >", 1), ("< Archives >", 2), ("< Settings >", 3), ("< Exit >", 4)],
-            name="Main Menu",
-            add_scroll_bar=True,
-            on_select=self._select)
-        
-        layout = Layout([100], fill_frame=True)
+
+        art = Layout([1], fill_frame=True)
+        self.add_layout(art)
+        #generate dust field effect of screen height and width
+        for _ in range(screen.height):
+            art.add_widget(Label("".join(random.choice([" ", "*", "+", "@", "."], screen.width-2, p=[0.94, 0.02, 0.01, 0.0005, 0.0295]))))
+
+        self._write_entry_button = Button("< Write Entry >", self._write_entry, add_box=False)
+        self._archives_button = Button("< Archives >", self._archives, add_box=False)
+        self._settings_button = Button("< Settings >", self._settings, add_box=False)
+        self._exit_button = Button("< Exit >", self._exit, add_box=False)
+
+        while len(self._write_entry_button.text) < screen.width//4-1:
+            self._write_entry_button.text = " " + self._write_entry_button.text + " "
+        while len(self._archives_button.text) < screen.width//4-1:
+            self._archives_button.text = " " + self._archives_button.text + " "
+        while len(self._settings_button.text) < screen.width//4-1:
+            self._settings_button.text = " " + self._settings_button.text + " "
+        while len(self._exit_button.text) < screen.width//4-1:
+            self._exit_button.text = " " + self._exit_button.text + " "
+
+        div = Layout([1])
+        self.add_layout(div)
+        div.add_widget(Divider())
+
+        layout = Layout([1, 1, 1, 1])
         self.add_layout(layout)
-        layout.add_widget(self._list_view)
+        layout.add_widget(self._write_entry_button, 0)
+        layout.add_widget(self._archives_button, 1)
+        layout.add_widget(self._settings_button, 2)
+        layout.add_widget(self._exit_button, 3)
+
 
         self.fix()
 
-    def _select(self):
-        if self._list_view.value == 1:
-            raise NextScene("Write Entry")
-        elif self._list_view.value == 2:
-            raise NextScene("Archives")
-        elif self._list_view.value == 3:
-            raise NextScene("Settings")
-        elif self._list_view.value == 4:
-            sys.exit(0)
+    def _write_entry(self): raise NextScene("Write Entry")
+
+    def _archives(self): raise NextScene("Archives")
+    
+    def _settings(self): raise NextScene("Settings")
+        
+    def _exit(self): sys.exit(0)
 
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):

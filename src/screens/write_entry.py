@@ -13,6 +13,7 @@ class Write_Entry(Frame):
         super(Write_Entry, self).__init__(screen, 
                                         screen.height, 
                                         screen.width, 
+                                        on_load=self.load_instance,
                                         hover_focus=False,
                                         can_scroll=True)
         

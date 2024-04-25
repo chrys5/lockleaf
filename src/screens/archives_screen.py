@@ -136,7 +136,6 @@ class Archives(Frame):
         self._instance["media"] = entry["media"]
         self._instance["time_created"] = entry["time_created"]
         self._instance["title_readonly"] = True
-        self._instance["scenes"][1].effects[0].load_instance()
         raise NextScene("Write Entry")
 
     def _delete(self):

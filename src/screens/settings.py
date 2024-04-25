@@ -8,7 +8,7 @@ from asciimatics.widgets import Frame, Layout, Text, Button, PopUpDialog, TextBo
 
 import sys
 import os
-from consts import CONFIG_PATH
+from config import CONFIG_PATH
 from screens.write_entry import Write_Entry
 
 class Settings(Frame):
@@ -48,7 +48,6 @@ class Settings(Frame):
 Lockleaf is a simple journaling application that encrypts your entries. It is designed to be simple and easy to use and is perfect for those who want to keep their thoughts private. If you forget your password, you will not be able to recover your entries. Keep your password safe and secure.
 Try not to resize the window, as it will cause the application to restart.
 
-[scroll up for info]
 - Shortcuts:
     Ctrl + q: Exit
     Escape: Back
