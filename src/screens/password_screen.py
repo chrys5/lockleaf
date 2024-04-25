@@ -52,6 +52,7 @@ class Password_Screen(Frame):
             self._instance["entry"] = ""
             self._instance["media"] = []
             self._instance["time_created"] = ""
+            self._reset_passwords()
             raise NextScene("Main Menu")
         else:
             self.scene.add_effect(self._password_error)
@@ -59,9 +60,9 @@ class Password_Screen(Frame):
     def _return_to_write_entry(self):
         raise NextScene("Write Entry")
     
-    def _reset_passwords(self, idx):
-        self._password_prompt.value("")
-        self._password_confirm.value("")
+    def _reset_passwords(self):
+        self._password_prompt.value = ""
+        self._password_confirm.value = ""
 
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):

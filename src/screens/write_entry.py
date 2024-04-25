@@ -120,13 +120,15 @@ class Write_Entry(Frame):
             elif event.key_code == Screen.ctrl("m"):
                 self._add_media()
             elif event.key_code == Screen.KEY_DELETE:
+                if not self._entry_box.value:
+                    return
                 curr_line = self._entry_box._line
                 line_arr = self._entry_box.value.split("\n")
                 if curr_line < len(line_arr):
                     line_arr.pop(curr_line)
                     self._entry_box.value = "\n".join(line_arr)
                     self._entry_box._line = curr_line
-                    if curr_line == len(line_arr):
+                    if curr_line == len(line_arr) and curr_line > 0:
                         self._entry_box._line -= 1
             elif event.key_code == Screen.KEY_INSERT:
                 #copy entry to clipboard

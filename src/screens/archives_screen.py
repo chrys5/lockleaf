@@ -103,6 +103,7 @@ class Archives(Frame):
                 if not is_encrypted(file):
                     encrypt_entry(os.path.join(root, file), password)
         self.screen.refresh()
+        self._password_prompt.value = ""
         raise ResizeScreenError("refresh app 2")
 
     def _decrypt_folder(self):
@@ -121,6 +122,7 @@ class Archives(Frame):
         if invalid_password:
             self.scene.add_effect(self._invalid_password)
         else:
+            self._password_prompt.value = ""
             raise ResizeScreenError("refresh app 2")
 
     def _open_entry(self):
@@ -136,6 +138,7 @@ class Archives(Frame):
         self._instance["media"] = entry["media"]
         self._instance["time_created"] = entry["time_created"]
         self._instance["title_readonly"] = True
+        self._password_prompt.value = ""
         raise NextScene("Write Entry")
 
     def _delete(self):
