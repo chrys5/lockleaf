@@ -23,8 +23,7 @@ class Password_Screen(Frame):
         self._cancel_button = Button("Cancel", self._return_to_write_entry)
         self._password_error = PopUpDialog(screen=screen, 
                                            text="Passwords do not match",
-                                           buttons=["OK"],
-                                           on_close=self._reset_passwords)
+                                           buttons=["OK"])
         
         layout = Layout([100], fill_frame=True)
         self.add_layout(layout)
@@ -52,17 +51,14 @@ class Password_Screen(Frame):
             self._instance["entry"] = ""
             self._instance["media"] = []
             self._instance["time_created"] = ""
-            self._reset_passwords()
+            self._password_prompt.value = ""
+            self._password_confirm.value = ""
             raise NextScene("Main Menu")
         else:
             self.scene.add_effect(self._password_error)
     
     def _return_to_write_entry(self):
         raise NextScene("Write Entry")
-    
-    def _reset_passwords(self):
-        self._password_prompt.value = ""
-        self._password_confirm.value = ""
 
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):
