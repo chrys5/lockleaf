@@ -1,7 +1,7 @@
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
 from asciimatics.event import KeyboardEvent
-from asciimatics.exceptions import NextScene, ResizeScreenError
+from asciimatics.exceptions import ResizeScreenError
 from asciimatics.widgets import Frame, PopUpDialog, Layout, FileBrowser, Widget, Text, Button
 
 from gerbil.encryption import secure_delete
@@ -9,6 +9,7 @@ from entry_processes import encrypt_entry, decrypt_entry, load_entry, is_encrypt
 
 import sys
 import os
+from nextscene2 import NextScene2
 
 class Archives(Frame):
     def __init__(self, screen, instance):
@@ -18,12 +19,10 @@ class Archives(Frame):
                                         hover_focus=False,
                                         can_scroll=False)
         
-
         self._instance = instance
         self.set_theme(instance["theme"])
-        root_path = self._instance["root_path"]
         self._file_browser = FileBrowser(height=Widget.FILL_COLUMN, 
-                                     root=root_path, 
+                                     root=self._instance["archives_root_path"], 
                                      name="FileBrowser",
                                      on_select=self._open_entry,
                                      on_change=self._update_buttons,
@@ -70,11 +69,14 @@ class Archives(Frame):
 
     def _update_buttons(self):
         self._selected_file.value = self._file_browser.value
+        self._instance["archives_root_path"] = self._file_browser._root
         if os.path.isdir(self._file_browser.value):
             self._encrypt_folder_button.disabled = False
             self._decrypt_folder_button.disabled = False
             self._open_button.disabled = True
-            if self._file_browser.value == self._instance["root_path"] or not self._file_browser.value.startswith(self._instance["root_path"]):
+            if not self._instance["root_path"] in self._file_browser.value:
+                self._encrypt_folder_button.disabled = True
+                self._decrypt_folder_button.disabled = True
                 self._password_prompt.disabled = True
                 self._delete_button.disabled = True
             elif os.path.basename(self._selected_file.value) == "0":
@@ -95,6 +97,8 @@ class Archives(Frame):
 
     def _encrypt_folder(self):
         folder_path = self._file_browser.value
+        if not self._instance["root_path"] in folder_path:
+            return
         if os.path.basename(folder_path) == "0":
             folder_path = os.path.dirname(folder_path)
         password = self._password_prompt.value
@@ -108,6 +112,8 @@ class Archives(Frame):
 
     def _decrypt_folder(self):
         folder_path = self._file_browser.value
+        if not self._instance["root_path"] in folder_path:
+            return
         if os.path.basename(folder_path) == "0":
             folder_path = os.path.dirname(folder_path)
         password = self._password_prompt.value
@@ -139,7 +145,7 @@ class Archives(Frame):
         self._instance["time_created"] = entry["time_created"]
         self._instance["title_readonly"] = True
         self._password_prompt.value = ""
-        raise NextScene("Write Entry")
+        raise NextScene2("Write Entry", self._instance)
 
     def _delete(self):
         self.scene.add_effect(self._delete_confirm)
@@ -154,11 +160,12 @@ class Archives(Frame):
             raise ResizeScreenError("refresh app 2")
 
     def _back_to_root(self):
+        self._instance["archives_root_path"] = self._instance["root_path"]
         raise ResizeScreenError("refresh app 2")
 
     def _cancel(self):
         self._password_prompt.value = ""
-        raise NextScene("Main Menu")
+        raise NextScene2("Main Menu", self._instance)
     
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):

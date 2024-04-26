@@ -1,1 +1,1 @@
-pyinstaller --onefile --icon=52949.ico src/lockleaf.py
+pyinstaller --onefile --icon=lockleaf.ico src/lockleaf.py

@@ -1,15 +1,12 @@
 from asciimatics.screen import Screen
-from asciimatics.scene import Scene
 from asciimatics.event import KeyboardEvent
-from asciimatics.particles import StarFirework, PalmFirework, SerpentFirework
-from asciimatics.renderers import FigletText
-from asciimatics.exceptions import NextScene, ResizeScreenError
+from asciimatics.exceptions import ResizeScreenError
 from asciimatics.widgets import Frame, Layout, Text, Button, PopUpDialog, TextBox, Widget
 
 import sys
 import os
 from config import CONFIG_PATH
-from screens.write_entry import Write_Entry
+from nextscene2 import NextScene2
 
 class Settings(Frame):
     def __init__(self, screen, instance):
@@ -24,7 +21,7 @@ class Settings(Frame):
         self._root_path = Text(label="Root Path", name="Root Path")
         self._theme = Text(label="Theme", name="Theme")
         self._ok_button = Button("OK", self._save_settings)
-        self._back_button = Button("Back", self._cancel)
+        self._back_button = Button("Back", self._back)
 
         self._about_text = TextBox(height=Widget.FILL_FRAME, as_string=True, line_wrap=True)
 
@@ -89,15 +86,15 @@ Try not to resize the window, as it will cause the application to restart.
             f.write('{"root_path": "' + fix_backslashes + '", "theme": "' + self._theme.value + '"}')
         self._instance["root_path"] = self._root_path.value
         self._instance["theme"] = self._theme.value
-        raise ResizeScreenError("refresh app 0")
+        self._back()
     
-    def _cancel(self):
-        raise ResizeScreenError("refresh app 0")
+    def _back(self):
+        raise NextScene2("Main Menu", self._instance)
     
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):
             if event.key_code == Screen.ctrl("q"):
                 sys.exit(0)
             elif event.key_code == Screen.KEY_ESCAPE:
-                self._cancel()
+                self._back()
         return super().process_event(event)

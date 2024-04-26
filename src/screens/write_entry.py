@@ -1,12 +1,14 @@
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
 from asciimatics.event import KeyboardEvent
-from asciimatics.exceptions import NextScene, ResizeScreenError
+from asciimatics.exceptions import ResizeScreenError
 from asciimatics.widgets import Frame, ListBox, Layout, Text, Button, Label, FileBrowser, Divider, TextBox, Widget, VerticalDivider, PopupMenu, PopUpDialog
 from entry_processes import save_entry
 import sys
 import pyperclip
 import datetime
+
+from nextscene2 import NextScene2
 
 class Write_Entry(Frame):
     def __init__(self, screen, instance):
@@ -19,9 +21,10 @@ class Write_Entry(Frame):
         
         self._instance = instance
         self.set_theme(instance["theme"])
-        self._title_box = Text(label="Title", name="Title")
-        self._folder_box = Text(label="Folder", name="Folder")
-        self._entry_box = TextBox(height=Widget.FILL_COLUMN, label="Entry", name="Entry", line_wrap=True, as_string=True)
+        self._title_box = Text(label="Title", name="Title", on_change=self._update_title_in_instance)
+        self._folder_box = Text(label="Folder", name="Folder", on_change=self._update_folder_in_instance)
+        self._entry_box = TextBox(height=Widget.FILL_COLUMN, label="Entry", name="Entry", line_wrap=True, as_string=True, on_change=self._update_entry_in_instance)
+
         self._media = ListBox(height=Widget.FILL_COLUMN, options=[], label="Media", add_scroll_bar=True)
         # self._media_browser = FileBrowser(height=Widget.FILL_COLUMN, 
         #                                   root=ROOT_PATH, 
@@ -77,6 +80,15 @@ class Write_Entry(Frame):
         if update_time_display:
             self._time_display.text = self._instance["time_created"]
 
+    def _update_title_in_instance(self):
+        self._instance["title"] = self._title_box.value
+    
+    def _update_folder_in_instance(self):
+        self._instance["folder"] = self._folder_box.value
+    
+    def _update_entry_in_instance(self):
+        self._instance["entry"] = self._entry_box.value
+
     def _update_instance(self):
         self._instance["title"] = self._title_box.value
         self._instance["folder"] = self._folder_box.value
@@ -88,7 +100,7 @@ class Write_Entry(Frame):
 
     def _prompt_password(self):
         self._update_instance()
-        raise NextScene("Password")
+        raise NextScene2("Password", self._instance)
         
     def _save_unencrypted(self):
         self._update_instance()
@@ -103,8 +115,15 @@ class Write_Entry(Frame):
         if self._save_popup in self.scene.effects:
             self.scene.remove_effect(self._save_popup)
 
-    def _leave(self, reset_instance=False):
-        raise ResizeScreenError("reset app 0")
+    def _leave(self, reset_instance=True):
+        if reset_instance:
+            self._instance["title"] = ""
+            self._instance["title_readonly"] = False
+            self._instance["folder"] = ""
+            self._instance["entry"] = ""
+            self._instance["media"] = []
+            self._instance["time_created"] = ""
+        raise NextScene2("Main Menu", self._instance)
         
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):

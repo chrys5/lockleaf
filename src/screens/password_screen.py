@@ -7,6 +7,8 @@ from asciimatics.widgets import Frame, Layout, Text, Button, PopUpDialog
 from entry_processes import save_entry
 import sys
 
+from nextscene2 import NextScene2
+
 class Password_Screen(Frame):
     def __init__(self, screen, instance):
         super(Password_Screen, self).__init__(screen, 
@@ -47,18 +49,19 @@ class Password_Screen(Frame):
                        self._instance["root_path"],
                        self._password_prompt.value)
             self._instance["title"] = ""
+            self._instance["title_readonly"] = False
             self._instance["folder"] = ""
             self._instance["entry"] = ""
             self._instance["media"] = []
             self._instance["time_created"] = ""
             self._password_prompt.value = ""
             self._password_confirm.value = ""
-            raise NextScene("Main Menu")
+            raise NextScene2("Main Menu", self._instance)
         else:
             self.scene.add_effect(self._password_error)
     
     def _return_to_write_entry(self):
-        raise NextScene("Write Entry")
+        raise NextScene2("Write Entry", self._instance)
 
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):

@@ -14,8 +14,7 @@ from screens.password_screen import Password_Screen
 from config import CONFIG_PATH
 
 import numpy.random as random
-
-instance = {}
+from nextscene2 import NextScene2
 
 class Main_Menu(Frame):
     def __init__(self, screen, instance):
@@ -28,7 +27,7 @@ class Main_Menu(Frame):
                                         reduce_cpu=True)
         
         self.set_theme(instance["theme"])
-
+        self._instance = instance
         art = Layout([1], fill_frame=True)
         self.add_layout(art)
         #generate dust field effect of screen height and width
@@ -63,11 +62,11 @@ class Main_Menu(Frame):
 
         self.fix()
 
-    def _write_entry(self): raise NextScene("Write Entry")
+    def _write_entry(self): raise NextScene2("Write Entry", self._instance)
 
-    def _archives(self): raise NextScene("Archives")
+    def _archives(self): raise NextScene2("Archives", self._instance)
     
-    def _settings(self): raise NextScene("Settings")
+    def _settings(self): raise NextScene2("Settings", self._instance)
         
     def _exit(self): sys.exit(0)
 
@@ -76,9 +75,9 @@ class Main_Menu(Frame):
             if event.key_code == Screen.ctrl("q"):
                 sys.exit(0)
             if event.key_code == Screen.ctrl("w"):
-                raise NextScene("Write Entry")
+                raise NextScene2("Write Entry", self._instance)
             if event.key_code == Screen.ctrl("a"):
-                raise NextScene("Archives")
+                raise NextScene2("Archives", self._instance)
         return super().process_event(event)
 
 def demo(screen, sceneidx, instance):
@@ -87,8 +86,9 @@ def demo(screen, sceneidx, instance):
         config = json.load(f)
 
     scenes = []
-    if instance == {}: #first time running
-        instance = {
+    if not instance: #first time running
+
+        default_instance = {
                     "title": "",
                     "title_readonly": False,
                     "folder": "",
@@ -96,9 +96,13 @@ def demo(screen, sceneidx, instance):
                     "media": [],
                     "time_created": "",
                     "root_path": config["root_path"],
+                    "archives_root_path" : config["root_path"],
                     "theme": config["theme"],
                     "scenes": scenes,
+                    "last_scene": 0
                 }
+        for key in default_instance:
+            instance[key] = default_instance[key]
 
     scenes_list = [
         Scene([Main_Menu(screen, instance)], -1, name = "Main Menu"),
@@ -109,16 +113,17 @@ def demo(screen, sceneidx, instance):
     ]
     for s in scenes_list:
         scenes.append(s)
+    
+    print([scenes.effects[0] for scenes in scenes_list])
 
     screen.play(scenes, stop_on_resize=True, start_scene=scenes_list[sceneidx])
 
-def start():
-    last_scene = 0
+def start(this_instance):
+    last_sceneidx = 0
     while True:
         try:
-            Screen.wrapper(demo, catch_interrupt=True, arguments=[last_scene, instance])
+            Screen.wrapper(demo, catch_interrupt=True, arguments=[last_sceneidx, this_instance])
         except ResizeScreenError as e:
-            if e.__str__()[-1] == '2':
-                last_scene = 2
-            else:
-                last_scene = 0
+            print(this_instance["last_scene"])
+            last_sceneidx = this_instance["last_scene"]
+

@@ -11,6 +11,7 @@ def main(stdscr):
     rows, cols = stdscr.getmaxyx()
     curses.resize_term(rows, cols)
     #keyboard.press('f11')
-    screens.main_menu.start()
+    this_instance = {}
+    screens.main_menu.start(this_instance)
 
 curses.wrapper(main)
