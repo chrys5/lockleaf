@@ -20,17 +20,12 @@ class Password_Screen(Frame):
         self._instance = instance
         self.set_theme(instance["theme"])
         self._password_prompt = Text(label="Enter Password:", name="Password", hide_char="*")
-        self._password_confirm = Text(label="Confirm Password:", name="Confirm Password", hide_char="*")
         self._ok_button = Button("OK", self._save_encrypted)
         self._cancel_button = Button("Cancel", self._return_to_write_entry)
-        self._password_error = PopUpDialog(screen=screen, 
-                                           text="Passwords do not match",
-                                           buttons=["OK"])
         
         layout = Layout([100], fill_frame=True)
         self.add_layout(layout)
         layout.add_widget(self._password_prompt)
-        layout.add_widget(self._password_confirm)
 
         layout2 = Layout([50, 50])
         self.add_layout(layout2)
@@ -40,25 +35,21 @@ class Password_Screen(Frame):
         self.fix()
 
     def _save_encrypted(self):
-        if self._password_prompt.value == self._password_confirm.value:
-            save_entry(self._instance["title"],
-                       self._instance["folder"],
-                       self._instance["entry"],
-                       self._instance["media"],
-                       self._instance["time_created"],
-                       self._instance["root_path"],
-                       self._password_prompt.value)
-            self._instance["title"] = ""
-            self._instance["title_readonly"] = False
-            self._instance["folder"] = ""
-            self._instance["entry"] = ""
-            self._instance["media"] = []
-            self._instance["time_created"] = ""
-            self._password_prompt.value = ""
-            self._password_confirm.value = ""
-            raise NextScene2("Main Menu", self._instance)
-        else:
-            self.scene.add_effect(self._password_error)
+        save_entry(self._instance["title"],
+                    self._instance["folder"],
+                    self._instance["entry"],
+                    self._instance["media"],
+                    self._instance["time_created"],
+                    self._instance["root_path"],
+                    self._password_prompt.value)
+        self._instance["title"] = ""
+        self._instance["title_readonly"] = False
+        self._instance["folder"] = ""
+        self._instance["entry"] = ""
+        self._instance["media"] = []
+        self._instance["time_created"] = ""
+        self._password_prompt.value = ""
+        raise NextScene2("Main Menu", self._instance)
     
     def _return_to_write_entry(self):
         raise NextScene2("Write Entry", self._instance)
@@ -73,11 +64,8 @@ class Password_Screen(Frame):
                 #toggle hide password
                 if self._password_prompt._hide_char:
                     self._password_prompt._hide_char = None
-                    self._password_confirm._hide_char = None
                 else:
                     self._password_prompt._hide_char = "*"
-                    self._password_confirm._hide_char = "*"
                 self._password_prompt.update(0)
-                self._password_confirm.update(0)
             
         return super().process_event(event)

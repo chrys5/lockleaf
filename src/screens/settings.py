@@ -86,7 +86,8 @@ Try not to resize the window, as it will cause the application to restart.
             f.write('{"root_path": "' + fix_backslashes + '", "theme": "' + self._theme.value + '"}')
         self._instance["root_path"] = self._root_path.value
         self._instance["theme"] = self._theme.value
-        self._back()
+        self._instance["last_scene"] = 0
+        raise ResizeScreenError("Restart application with new settings")
     
     def _back(self):
         raise NextScene2("Main Menu", self._instance)

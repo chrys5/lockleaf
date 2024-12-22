@@ -31,7 +31,6 @@ class Archives(Frame):
         self._selected_file.disabled = True
         self._password_prompt = Text(label="Password:", name="Password", hide_char="*")
         
-        self._back_to_root_button = Button("Root", self._back_to_root)
         self._encrypt_folder_button = Button("Encrypt All Entries", self._encrypt_folder)
         self._decrypt_folder_button = Button("Decrypt All Entries", self._decrypt_folder)
         self._open_button = Button("Open", self._open_entry)
@@ -55,15 +54,14 @@ class Archives(Frame):
         text_layout.add_widget(self._selected_file)
         text_layout.add_widget(self._password_prompt)
 
-        layout2 = Layout([2, 2, 1, 1, 1, 1])
+        layout2 = Layout([2, 2, 1, 1, 1])
         self.add_layout(layout2)
         
         layout2.add_widget(self._encrypt_folder_button, 0)
         layout2.add_widget(self._decrypt_folder_button, 1)
-        layout2.add_widget(self._back_to_root_button, 2)
-        layout2.add_widget(self._open_button, 3)
-        layout2.add_widget(self._delete_button, 4)
-        layout2.add_widget(self._back_button, 5)
+        layout2.add_widget(self._open_button, 2)
+        layout2.add_widget(self._delete_button, 3)
+        layout2.add_widget(self._back_button, 4)
 
         self.fix()
 

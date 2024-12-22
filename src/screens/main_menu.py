@@ -64,7 +64,9 @@ class Main_Menu(Frame):
 
     def _write_entry(self): raise NextScene2("Write Entry", self._instance)
 
-    def _archives(self): raise NextScene2("Archives", self._instance)
+    def _archives(self): 
+        self._instance["last_scene"] = 2
+        raise ResizeScreenError("refresh app 2")
     
     def _settings(self): raise NextScene2("Settings", self._instance)
         
@@ -77,7 +79,8 @@ class Main_Menu(Frame):
             if event.key_code == Screen.ctrl("w"):
                 raise NextScene2("Write Entry", self._instance)
             if event.key_code == Screen.ctrl("a"):
-                raise NextScene2("Archives", self._instance)
+                self._instance["last_scene"] = 2
+                raise ResizeScreenError("refresh app 2")
         return super().process_event(event)
 
 def demo(screen, sceneidx, instance):
@@ -113,8 +116,6 @@ def demo(screen, sceneidx, instance):
     ]
     for s in scenes_list:
         scenes.append(s)
-    
-    print([scenes.effects[0] for scenes in scenes_list])
 
     screen.play(scenes, stop_on_resize=True, start_scene=scenes_list[sceneidx])
 
@@ -124,6 +125,9 @@ def start(this_instance):
         try:
             Screen.wrapper(demo, catch_interrupt=True, arguments=[last_sceneidx, this_instance])
         except ResizeScreenError as e:
-            print(this_instance["last_scene"])
             last_sceneidx = this_instance["last_scene"]
+        except Exception as e:
+            print(e)
+            break
+    _ = input("Press enter to exit")
 
